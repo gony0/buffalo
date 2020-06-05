@@ -394,6 +394,8 @@ class Data(object):
             fin.seek(0, 2)
             approximated_data_mb = db.attrs['num_nnz'] * 3 * 4 / 1024 / 1024
         buffer_mb = int(max(1024, available_mb * 0.75))
+        self.logger.info(f'available_mb: {available_mb}')
+        self.logger.info(f'approximated_data_mb: {approximated_data_mb}')
         # for each sides
         for group, sep_idx, max_key in [('rowwise', 0, db.attrs['num_users']),
                                         ('colwise', 1, db.attrs['num_items'])]:
@@ -402,7 +404,7 @@ class Data(object):
             self.logger.info(f'Building compressed triplets for {group}...')
             self.logger.info('Preprocessing...')
             self.prepro.pre(db)
-            if approximated_data_mb * 1.2 < available_mb:
+            if approximated_data_mb * 4 < available_mb:
                 self.logger.info('In-memory Compressing ...')
                 job_files = self._sort_and_compressed_binarization(
                     working_data_path,
